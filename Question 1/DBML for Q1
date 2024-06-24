@@ -1,0 +1,136 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+// Hotels Table
+Table Hotels {
+    hotel_id int [pk, increment]
+    name varchar(255)
+    address varchar(255)
+    city varchar(100)
+    state varchar(100)
+    country varchar(100)
+    zip varchar(20)
+    phone varchar(20)
+    email varchar(100)
+    num_available_rooms int
+}
+
+// Rooms Table
+Table Rooms {
+    room_id int [pk, increment]
+    hotel_id int [ref: > Hotels.hotel_id]
+    room_number varchar(10)
+    room_type_id int [ref: > RoomTypes.room_type_id]
+    price_per_night decimal(10, 2)
+    availability boolean [default: true]
+}
+
+// RoomTypes Table
+Table RoomTypes {
+    room_type_id int [pk, increment]
+    room_type_name varchar(50)
+    description text
+}
+
+// RoomAmenities Table
+Table RoomAmenities {
+    amenity_id int [pk, increment]
+    roomId int [ref: > Rooms.room_id]
+    amenity_name varchar(100)
+}
+
+// HotelAmenities Table
+Table HotelAmenities {
+    amenity_id int [pk, increment]
+    hotel_id int [ref: > Hotels.hotel_id]
+    amenity_name varchar(100)
+}
+
+// Guests Table
+Table Guests {
+    guest_id int [pk, increment]
+    first_name varchar(100)
+    last_name varchar(100)
+    email varchar(100) [unique]
+    phone varchar(20)
+    address varchar(255)
+    city varchar(100)
+    state varchar(100)
+    country varchar(100)
+    zip varchar(20)
+}
+
+// Reservations Table
+Table Reservations {
+    reservation_id int [pk, increment]
+    guest_id int [ref: > Guests.guest_id]
+    hotel_id int [ref: > Hotels.hotel_id]
+    room_id int [ref: > Rooms.room_id]
+    checkin_date date
+    checkout_date date
+    total_price decimal(10, 2)
+    reservation_date timestamp [default: `current_timestamp`]
+    status varchar(50) [default: 'Booked']
+}
+
+// Payments Table
+Table Payments {
+    payment_id int [pk, increment]
+    reservation_id int [ref: > Reservations.reservation_id]
+    payment_date timestamp [default: `current_timestamp`]
+    amount decimal(10, 2)
+    payment_method varchar(50)
+    status varchar(50) [default: 'Completed']
+}
+
+// Cancellations Table
+Table Cancellations {
+    cancellation_id int [pk, increment]
+    reservation_id int [ref: > Reservations.reservation_id]
+    cancellation_date timestamp [default: `current_timestamp`]
+    refund_amount decimal(10, 2)
+    reason text
+}
+
+// HotelReviews Table
+Table HotelReviews {
+    review_id int [pk, increment]
+    hotel_id int [ref: > Hotels.hotel_id]
+    guest_id int [ref: > Guests.guest_id]
+    review_date timestamp [default: `current_timestamp`]
+    rating int [note: 'Rating from 0 to 100']
+    comment text
+}
+
+// Users Table
+Table Users {
+    user_id int [pk, increment]
+    username varchar(50) [unique, not null]
+    email varchar(100) [unique, not null]
+    password_hash varchar(255) [not null]
+    salt varchar(255) [not null]
+    role_id int [ref: > Roles.role_id]
+    created_at timestamp [default: `current_timestamp`]
+    updated_at timestamp
+}
+
+// Roles Table
+Table Roles {
+    role_id int [pk, increment]
+    role_name varchar(50) [unique, not null]
+    description text
+}
+
+// Permissions Table
+Table Permissions {
+    permission_id int [pk, increment]
+    permission_name varchar(50) [unique, not null]
+    description text
+}
+
+// RolePermissions Table
+Table RolePermissions {
+    rolepermission_id int [pk, increment]
+    role_id int [ref: > Roles.role_id]
+    permission_id int [ref: > Permissions.permission_id]
+}
